@@ -32,6 +32,57 @@ const memes = [
   },
 ];
 
+app.get("/memes", (req, res) => {
+  res.send(memes);
+});
+
+app.get("/meme/:id", (req, res) => {
+  const meme = memes.find((meme) => meme.id === req.params.id);
+  if (!meme) res.status(422).json("meme not found");
+  else res.status(200).send(meme);
+});
+
+app.get("/memes/filter", (req, res) => {
+  const { genre } = req.query;
+  if (!genre) {
+    res.status(400).json("invalid query parameter");
+  } else {
+    const filteredMemes = memes.filter((meme) => meme.genre.includes(genre));
+    res.status(200).send(filteredMemes);
+  }
+});
+
+app.post("/memes", (req, res) => {
+  const { name, imgSource, genre } = req.body;
+  if (!name || !imgSource || !genre) {
+    return res.status(400).json("cannot create meme due to missing details");
+  } else {
+    const newMeme = { name, imgSource, genre, id: memes.length.toString() };
+    memes.push(newMeme);
+    res.status(201).send(newMeme);
+  }
+});
+
+app.put("/meme/:id", (req, res, next) => {
+  const memeIndex = memes.findIndex((meme) => meme.id === req.params.id);
+  if (memeIndex === -1) {
+    res.status(422).json("meme not found");
+  } else {
+    memes[memeIndex] = req.body;
+    res.status(200).send(memes[memeIndex]);
+  }
+});
+
+app.delete("/meme/:id", (req, res) => {
+  const memeIndex = memes.findIndex((meme) => meme.id === req.params.id);
+  if (memeIndex === -1) {
+    res.status(422).json("meme not found");
+  } else {
+    const filteredMemes = memes.filter((meme) => meme.id !== req.params.id);
+    res.status(200).send(filteredMemes);
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}/`);
 });
