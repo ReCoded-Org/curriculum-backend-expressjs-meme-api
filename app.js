@@ -68,7 +68,8 @@ app.put("/meme/:id", (req, res, next) => {
   if (memeIndex === -1) {
     res.status(422).json("meme not found");
   } else {
-    memes[memeIndex] = req.body;
+    const updatedMeme = {...memes[memeIndex], ...req.body};
+    memes[memeIndex] = updatedMeme;
     res.status(200).send(memes[memeIndex]);
   }
 });
@@ -78,8 +79,8 @@ app.delete("/meme/:id", (req, res) => {
   if (memeIndex === -1) {
     res.status(422).json("meme not found");
   } else {
-    const filteredMemes = memes.filter((meme) => meme.id !== req.params.id);
-    res.status(200).send(filteredMemes);
+    memes.splice(memeIndex, 1);
+    res.status(200).send(memes);
   }
 });
 
